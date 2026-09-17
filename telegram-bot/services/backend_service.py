@@ -165,3 +165,11 @@ def get_active_promotion(token: str) -> dict:
     resp = requests.get(f"{BACKEND_API_URL}/billing/promotions/active", headers=headers)
     resp.raise_for_status()
     return resp.json()
+
+
+def list_promotions() -> list:
+    """Admin-only. Returns every promotion (active and inactive), newest first."""
+    headers = {"x-admin-key": ADMIN_API_KEY}
+    resp = requests.get(f"{BACKEND_API_URL}/billing/promotions", headers=headers)
+    resp.raise_for_status()
+    return resp.json().get("promotions", [])
