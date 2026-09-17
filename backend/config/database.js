@@ -19,7 +19,7 @@ db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
 function initSchema() {
-    const schemaPath = path.join(__dirname, '../../database/schema.sql');
+    const schemaPath = path.join(__dirname, '../database/schema.sql');
     const schema = fs.readFileSync(schemaPath, 'utf8');
     db.exec(schema);
     console.log(`✓ Database initialized at ${dbPath}`);
