@@ -34,6 +34,19 @@ function signup(req, res) {
         'INSERT INTO workspace_members (workspace_id, user_id, role) VALUES (?, ?, ?)'
     ).run(workspaceId, userId, 'owner');
 
+    // Every new workspace starts with a subscription row. TRIAL_DAYS=0 (the
+    // default) skips the trial and goes straight to pending_payment; set
+    // TRIAL_DAYS to a positive number to give new signups free time first.
+    const trialDays = parseInt(process.env.TRIAL_DAYS || '0', 10);
+    const subStatus = trialDays > 0 ? 'trial' : 'pending_payment';
+    const trialEndsAt = trialDays > 0
+        ? new Date(Date.now() + trialDays * 24 * 60 * 60 * 1000).toISOString()
+        : null;
+
+    db.prepare(
+        'INSERT INTO subscriptions (workspace_id, status, trial_ends_at) VALUES (?, ?, ?)'
+    ).run(workspaceId, subStatus, trialEndsAt);
+
     const token = jwt.sign(
         { id: userId, email, workspaceId, role: 'owner' },
         process.env.JWT_SECRET,
@@ -43,7 +56,8 @@ function signup(req, res) {
     res.status(201).json({
         token,
         user: { id: userId, email, fullName },
-        workspace: { id: workspaceId, name: workspaceName, role: 'owner' }
+        workspace: { id: workspaceId, name: workspaceName, role: 'owner' },
+        subscription: { status: subStatus, trialEndsAt }
     });
 }
 
