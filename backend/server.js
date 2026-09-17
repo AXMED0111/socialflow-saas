@@ -11,6 +11,7 @@ const teamRoutes = require('./routes/team');
 const mediaRoutes = require('./routes/media');
 const postsRoutes = require('./routes/posts');
 const socialAccountsRoutes = require('./routes/socialAccounts');
+const billingRoutes = require('./routes/billing');
 
 initSchema();
 
@@ -24,6 +25,7 @@ app.use('/api/team', teamRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/posts', postsRoutes);
 app.use('/api/accounts', socialAccountsRoutes);
+app.use('/api/billing', billingRoutes);
 
 app.get('/health', (req, res) => res.json({ status: 'ok', company: process.env.COMPANY_NAME }));
 
